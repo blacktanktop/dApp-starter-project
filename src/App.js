@@ -146,6 +146,9 @@ const App = () => {
         );
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
+        /* コントラクトの現在の資金額 */
+        let contractBalance = await provider.getBalance(wavePortalContract.address);
+        console.log("Contract balance:", ethers.utils.formatEther(contractBalance));
         /* コントラクトに👋（wave）を書き込む */
         const waveTxn = await wavePortalContract.wave(messageValue, {
           gasLimit: 300000,
@@ -155,6 +158,20 @@ const App = () => {
         console.log("Mined -- ", waveTxn.hash);
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
+        let contractBalance_post = await provider.getBalance(
+          wavePortalContract.address
+        );
+        /* コントラクトの残高が減っていることを確認 */
+        if (contractBalance_post.lt(contractBalance_post)) {
+          /* 減っていたら下記を出力 */
+          console.log("User won ETH!");
+        } else {
+          console.log("User didn't win ETH.");
+        }
+        console.log(
+          "Contract balance after wave:",
+          ethers.utils.formatEther(contractBalance_post)
+        );
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -175,19 +192,20 @@ const App = () => {
           <span role="img" aria-label="hand-wave">
             👋
           </span>{" "}
-          WELCOME!
+          くろたんく WavePortalへようこそ
         </div>
         <div className="bio">
-          イーサリアムウォレットを接続して、メッセージを作成したら、
+          イーサリアムウォレットを接続して、メッセージを作成したら、<br />
           <span role="img" aria-label="hand-wave">
             👋
           </span>
-          を送ってください
+          を送ってください。もしかするとETH(Goerli)がもらえるかも?!
           <span role="img" aria-label="shine">
             ✨
           </span>
         </div>
         <br />
+        {/* {document.write()}; */}
         {/* ウォレットコネクトのボタンを実装 */}
         {!currentAccount && (
           <button className="waveButton" onClick={connectWallet}>
@@ -200,7 +218,7 @@ const App = () => {
         {/* waveボタンにwave関数を連動 */}
         {currentAccount && (
           <button className="waveButton" onClick={wave}>
-            Wave at Me
+            👋 Wave at Me 👋
           </button>
         )}
         {/* メッセージボックスを実装*/}
